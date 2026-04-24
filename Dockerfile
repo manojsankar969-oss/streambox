@@ -8,7 +8,6 @@ RUN npm ci
 
 COPY . .
 RUN mkdir -p public
-RUN mkdir -p src && cp -r streambox/src/. src/
 
 RUN npm run build
 
