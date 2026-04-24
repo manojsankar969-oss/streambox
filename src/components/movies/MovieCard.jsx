@@ -30,14 +30,15 @@ export default function MovieCard({
   const handleWatchlistToggle = async (e) => {
     e.preventDefault()
     e.stopPropagation()
-    if (!user) {
-      window.location.href = '/login'
-      return
-    }
     if (inWatchlist) {
       removeFromWatchlist.mutate({ tmdbId: id, mediaType })
     } else {
-      addToWatchlist.mutate({ tmdbId: id, mediaType })
+      addToWatchlist.mutate({
+        tmdbId: id,
+        mediaType,
+        title,
+        posterPath,
+      })
     }
   }
 

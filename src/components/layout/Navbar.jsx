@@ -3,23 +3,24 @@
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { useState } from 'react'
-import { Search, Bell, Menu, X, Heart, User, LogOut, Sun, Moon } from 'lucide-react'
+import { Search, Bell, Menu, X, Heart, User, LogOut, Settings } from 'lucide-react'
 import { useFirebaseAuth, useGoogleSignIn } from '@/hooks/useFirebaseAuth'
-import { useTheme } from '@/components/ThemeProvider'
 
 export default function Navbar() {
   const pathname = usePathname()
   const router = useRouter()
   const { user, loading } = useFirebaseAuth()
   const { signOut } = useGoogleSignIn()
-  const { theme, toggleTheme } = useTheme()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   
     const handleSearch = (e) => {
       e.preventDefault()
+      console.log('Search triggered with query:', searchQuery)
       if (searchQuery.trim()) {
-        router.push(`/search?q=${encodeURIComponent(searchQuery.trim())}`)
+        const url = `/search?q=${encodeURIComponent(searchQuery.trim())}`
+        console.log('Navigating to:', url)
+        window.location.href = url
         setSearchQuery('')
       }
     }
@@ -70,13 +71,6 @@ export default function Navbar() {
             </form>
   
             <div className="flex items-center gap-4">
-              <button 
-                onClick={toggleTheme}
-                className="text-zinc-400 hover:text-white transition-colors p-2"
-                title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
-              >
-                {theme === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
-              </button>
               <button className="text-zinc-400 hover:text-white transition-colors">
                 <Bell className="h-5 w-5" />
               </button>
@@ -117,6 +111,9 @@ export default function Navbar() {
                   <Link href="/watchlist" className="flex items-center gap-2 px-3 py-2 text-sm text-zinc-400 hover:text-white hover:bg-zinc-800 rounded-lg transition-colors">
                     <Heart className="h-4 w-4" /> Watchlist
                   </Link>
+                  <Link href="/settings" className="flex items-center gap-2 px-3 py-2 text-sm text-zinc-400 hover:text-white hover:bg-zinc-800 rounded-lg transition-colors">
+                    <Settings className="h-4 w-4" /> Settings
+                  </Link>
                   <button
                     onClick={signOut}
                     className="w-full flex items-center gap-2 px-3 py-2 text-sm text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"
@@ -153,6 +150,11 @@ export default function Navbar() {
           {!user && (
             <Link href="/login" className="block text-[#FFBF00] font-bold uppercase tracking-widest text-sm">
               Sign In
+            </Link>
+          )}
+          {user && (
+            <Link href="/settings" className="block text-zinc-400 font-medium uppercase tracking-widest text-sm hover:text-[#FFBF00] transition-colors">
+              Settings
             </Link>
           )}
         </div>

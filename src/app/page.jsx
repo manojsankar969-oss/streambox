@@ -7,7 +7,7 @@ import { tmdb, getImageUrl } from '@/lib/tmdb'
 async function getTrendingMovies() {
   try {
     const data = await tmdb.movies.trending(1)
-    return data.results.slice(0, 6)
+    return data.results.slice(0, 12)
   } catch {
     return []
   }
@@ -16,7 +16,7 @@ async function getTrendingMovies() {
 async function getPopularMovies() {
   try {
     const data = await tmdb.movies.popular(1)
-    return data.results.slice(0, 6)
+    return data.results.slice(0, 12)
   } catch {
     return []
   }
@@ -25,7 +25,7 @@ async function getPopularMovies() {
 async function getTrendingTv() {
   try {
     const data = await tmdb.tv.trending(1)
-    return data.results.slice(0, 6)
+    return data.results.slice(0, 12)
   } catch {
     return []
   }
@@ -34,7 +34,7 @@ async function getTrendingTv() {
 async function getTopRatedMovies() {
   try {
     const data = await tmdb.movies.topRated(1)
-    return data.results.slice(0, 6)
+    return data.results.slice(0, 12)
   } catch {
     return []
   }
@@ -60,6 +60,9 @@ export default async function HomePage() {
     getTopRatedMovies(),
     getFeaturedMovie(),
   ])
+
+  const featuredId = featured?.id
+  const trendingWithoutFeatured = trendingMovies.filter(m => m.id !== featuredId)
 
   return (
     <div className="min-h-screen">
@@ -123,7 +126,7 @@ export default async function HomePage() {
             View All <ChevronRight className="h-4 w-4" />
           </Link>
         </div>
-        <MovieGrid items={trendingMovies} mediaType="movie" />
+        <MovieGrid items={trendingWithoutFeatured} mediaType="movie" />
       </section>
 
       <section className="container mx-auto px-4 py-12">

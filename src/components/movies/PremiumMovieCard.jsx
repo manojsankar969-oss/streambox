@@ -25,14 +25,16 @@ export default function PremiumMovieCard({ item, mediaType }) {
   const handleWatchlistToggle = async (e) => {
     e.preventDefault()
     e.stopPropagation()
-    if (!user) {
-      window.location.href = '/login'
-      return
-    }
+    // Removed login check for testing
     if (inWatchlist) {
       removeFromWatchlist.mutate({ tmdbId: id, mediaType })
     } else {
-      addToWatchlist.mutate({ tmdbId: id, mediaType })
+      addToWatchlist.mutate({
+        tmdbId: id,
+        mediaType,
+        title,
+        posterPath,
+      })
     }
   }
 
@@ -57,7 +59,7 @@ export default function PremiumMovieCard({ item, mediaType }) {
         className={cn(
           'absolute top-3 right-3 p-2 rounded-full z-40 transition-all active:scale-90',
           inWatchlist 
-            ? 'bg-[#FFBF00] text-[#402d00] shadow-[0_0_15px_rgba(255,191,0,0.4)]' 
+            ? 'bg-red-500 text-white shadow-[0_0_15px_rgba(239,68,68,0.5)]' 
             : 'bg-black/40 backdrop-blur-md text-white border border-white/10 hover:bg-black/60'
         )}
       >

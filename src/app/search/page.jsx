@@ -4,7 +4,7 @@ import { useState, useEffect, Suspense } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { Search, Film, Tv, User } from 'lucide-react'
 import PremiumMovieCard from '@/components/movies/PremiumMovieCard'
-import { tmdb, getImageUrl } from '@/lib/tmdb'
+import { getImageUrl } from '@/lib/tmdb'
 
 function useDebounce(value, delay = 500) {
   const [debounced, setDebounced] = useState(value)
@@ -24,35 +24,55 @@ function SearchContent() {
   const [searchType, setSearchType] = useState('all')
   const [results, setResults] = useState([])
   const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState('')
   const [page, setPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
   const debouncedQuery = useDebounce(query)
 
   useEffect(() => {
-    if (initialQuery) {
-      handleSearch()
+    const typeFromUrl = searchParams.get('type') || 'all'
+    const pageFromUrl = Number(searchParams.get('page') || 1)
+    if (typeFromUrl !== searchType) {
+      setSearchType(typeFromUrl)
     }
+    if (initialQuery) {
+      handleSearch(pageFromUrl, initialQuery, typeFromUrl)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  const handleSearch = async (searchPage = 1) => {
-    if (!query.trim()) return
+  useEffect(() => {
+    if (!debouncedQuery || debouncedQuery.trim() === initialQuery.trim()) return
+    handleSearch(1, debouncedQuery, searchType)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [debouncedQuery, searchType])
+
+  const handleSearch = async (searchPage = 1, currentQuery = query, currentType = searchType) => {
+    if (!currentQuery.trim()) return
     
     setIsLoading(true)
+    setError('')
     try {
-      let data
-      if (searchType === 'movie') {
-        data = await tmdb.search.movies(query, searchPage)
-      } else if (searchType === 'tv') {
-        data = await tmdb.search.tv(query, searchPage)
-      } else if (searchType === 'person') {
-        data = await tmdb.search.persons(query, searchPage)
-      } else {
-        data = await tmdb.search.multi(query, searchPage)
+      const response = await fetch(
+        `/api/search?q=${encodeURIComponent(currentQuery)}&type=${currentType}&page=${searchPage}`
+      )
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Search failed')
       }
-      setResults(data.results)
-      setTotalPages(data.total_pages)
+
+      setResults(data.results || [])
+      setTotalPages(data.total_pages || 1)
       setPage(searchPage)
-      router.push(`/search?q=${encodeURIComponent(query)}&type=${searchType}&page=${searchPage}`, { scroll: false })
+      router.push(
+        `/search?q=${encodeURIComponent(currentQuery)}&type=${currentType}&page=${searchPage}`,
+        { scroll: false }
+      )
+    } catch (err) {
+      setError(err.message || 'Unable to fetch search results.')
+      setResults([])
+      setTotalPages(1)
     } finally {
       setIsLoading(false)
     }
@@ -194,6 +214,12 @@ function SearchContent() {
           <User className="h-4 w-4" /> Actors
         </button>
       </div>
+
+      {error && (
+        <div className="mb-6 p-4 rounded-lg border border-red-500/20 bg-red-500/10 text-red-300 text-sm">
+          {error}
+        </div>
+      )}
 
       {renderResults()}
 

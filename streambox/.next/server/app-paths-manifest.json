@@ -1,10 +1,1 @@
-{
-  "/watchlist/page": "app/watchlist/page.js",
-  "/page": "app/page.js",
-  "/actors/[id]/page": "app/actors/[id]/page.js",
-  "/movies/[id]/page": "app/movies/[id]/page.js",
-  "/actors/page": "app/actors/page.js",
-  "/login/page": "app/login/page.js",
-  "/tv/page": "app/tv/page.js",
-  "/movies/page": "app/movies/page.js"
-}
+{}

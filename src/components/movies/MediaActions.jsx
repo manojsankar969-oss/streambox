@@ -8,18 +8,20 @@ import { cn } from '@/lib/utils'
 export default function MediaActions({ tmdbId, mediaType, title, posterPath }) {
   const { user } = useUser()
   const { isInWatchlist, addToWatchlist, removeFromWatchlist } = useWatchlist(user?.id)
+  const isPending = addToWatchlist.isPending || removeFromWatchlist.isPending
   
   const inWatchlist = isInWatchlist(tmdbId, mediaType)
 
   const handleWatchlistToggle = () => {
-    if (!user) {
-      window.location.href = '/login'
-      return
-    }
     if (inWatchlist) {
       removeFromWatchlist.mutate({ tmdbId, mediaType })
     } else {
-      addToWatchlist.mutate({ tmdbId, mediaType })
+      addToWatchlist.mutate({
+        tmdbId,
+        mediaType,
+        title,
+        posterPath,
+      })
     }
   }
 
@@ -49,8 +51,9 @@ export default function MediaActions({ tmdbId, mediaType, title, posterPath }) {
     <div className="flex flex-wrap gap-4">
       <button
         onClick={handleWatchlistToggle}
+        disabled={isPending}
         className={cn(
-          'flex items-center gap-2 px-6 py-3 rounded-lg font-semibold transition-all',
+          'flex items-center gap-2 px-6 py-3 rounded-lg font-semibold transition-all disabled:opacity-50',
           inWatchlist 
             ? 'bg-primary text-primary-foreground' 
             : 'bg-secondary hover:bg-secondary/80'

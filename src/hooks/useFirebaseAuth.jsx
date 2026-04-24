@@ -29,16 +29,23 @@ export function FirebaseAuthProvider({ children }) {
       return
     }
 
+    // Safety timeout — if Firebase doesn't respond in 5s, unblock the app
+    const timeout = setTimeout(() => setLoading(false), 5000)
+
     // Handle redirect result (from signInWithRedirect fallback)
     getRedirectResult(auth).catch(() => {
       // Ignore — no redirect in progress
     })
 
     const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+      clearTimeout(timeout)
       setUser(firebaseUser)
       setLoading(false)
     })
-    return () => unsubscribe()
+    return () => {
+      clearTimeout(timeout)
+      unsubscribe()
+    }
   }, [])
 
   return (
