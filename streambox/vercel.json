@@ -1,0 +1,33 @@
+{
+  "buildCommand": "npm run build",
+  "outputDirectory": ".next",
+  "framework": "nextjs",
+  "installCommand": "npm install",
+  "regions": ["automatic"],
+  "envVars": [
+    {
+      "group": "streambox",
+      "envVars": [
+        {
+          "key": "NEXT_PUBLIC_SUPABASE_URL",
+          "description": "Your Supabase project URL"
+        },
+        {
+          "key": "NEXT_PUBLIC_SUPABASE_ANON_KEY",
+          "description": "Your Supabase anonymous key"
+        }
+      ]
+    }
+  ],
+  "headers": [
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-cache, no-store, must-revalidate"
+        }
+      ]
+    }
+  ]
+}

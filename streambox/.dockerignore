@@ -1,0 +1,10 @@
+.vscode/
+.env.local
+.next/
+out/
+dist/
+build/
+*.log
+node_modules/
+.DS_Store
+*.pem
