@@ -2,20 +2,35 @@ const API_KEY = process.env.TMDB_API_KEY || process.env.NEXT_PUBLIC_TMDB_API_KEY
 const BASE_URL = 'https://api.themoviedb.org/3'
 
 const checkApiKey = () => {
-  if (!API_KEY && process.env.NODE_ENV === 'production') {
-    throw new Error('Missing NEXT_PUBLIC_TMDB_API_KEY environment variable')
+  if (!API_KEY) {
+    console.warn('⚠️ TMDB_API_KEY is missing. Configure it in your environment variables.')
+    if (process.env.NODE_ENV === 'production') {
+      throw new Error('Missing NEXT_PUBLIC_TMDB_API_KEY environment variable')
+    }
   }
 }
 
 const fetchTMDB = async (endpoint) => {
   checkApiKey()
-  if (!API_KEY) return { results: [], total_pages: 0, total_results: 0 }
+  if (!API_KEY) {
+    console.error('❌ Cannot fetch from TMDB: API key not configured')
+    return { results: [], total_pages: 0, total_results: 0 }
+  }
   const url = `${BASE_URL}${endpoint}${endpoint.includes('?') ? '&' : '?'}api_key=${API_KEY}`
-  const res = await fetch(url, {
-    next: { revalidate: 3600 }
-  })
-  if (!res.ok) throw new Error(`TMDB API error: ${res.status}`)
-  return res.json()
+  try {
+    const res = await fetch(url, {
+      next: { revalidate: 60 } // Reduced from 3600s to 60s for quicker updates
+    })
+    if (!res.ok) {
+      console.error(`❌ TMDB API error: ${res.status} ${res.statusText}`)
+      throw new Error(`TMDB API error: ${res.status}`)
+    }
+    const data = await res.json()
+    return data
+  } catch (error) {
+    console.error(`❌ Failed to fetch from TMDB ${endpoint}:`, error.message)
+    throw error
+  }
 }
 
 export const tmdb = {

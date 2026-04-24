@@ -7,8 +7,10 @@ import { tmdb, getImageUrl } from '@/lib/tmdb'
 async function getTrendingMovies() {
   try {
     const data = await tmdb.movies.trending(1)
+    console.log('✅ Trending movies loaded:', data.results?.length || 0, 'items')
     return data.results.slice(0, 12)
-  } catch {
+  } catch (error) {
+    console.error('❌ Error loading trending movies:', error.message)
     return []
   }
 }
@@ -16,8 +18,10 @@ async function getTrendingMovies() {
 async function getPopularMovies() {
   try {
     const data = await tmdb.movies.popular(1)
+    console.log('✅ Popular movies loaded:', data.results?.length || 0, 'items')
     return data.results.slice(0, 12)
-  } catch {
+  } catch (error) {
+    console.error('❌ Error loading popular movies:', error.message)
     return []
   }
 }
@@ -25,8 +29,10 @@ async function getPopularMovies() {
 async function getTrendingTv() {
   try {
     const data = await tmdb.tv.trending(1)
+    console.log('✅ Trending TV shows loaded:', data.results?.length || 0, 'items')
     return data.results.slice(0, 12)
-  } catch {
+  } catch (error) {
+    console.error('❌ Error loading trending TV:', error.message)
     return []
   }
 }
@@ -34,8 +40,10 @@ async function getTrendingTv() {
 async function getTopRatedMovies() {
   try {
     const data = await tmdb.movies.topRated(1)
+    console.log('✅ Top rated movies loaded:', data.results?.length || 0, 'items')
     return data.results.slice(0, 12)
-  } catch {
+  } catch (error) {
+    console.error('❌ Error loading top rated movies:', error.message)
     return []
   }
 }
